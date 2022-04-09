@@ -1,8 +1,12 @@
+package src;
+
 import java.awt.*;
 import java.awt.Color;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+
+import src.pieces.Piece;
 
 public class ChessUI extends JFrame implements MouseListener, MouseMotionListener {
     JLayeredPane layeredPane;
@@ -23,8 +27,7 @@ public class ChessUI extends JFrame implements MouseListener, MouseMotionListene
     int xAdjustment;
     int yAdjustment;
 
-
-    public ChessUI(){
+    public ChessUI() {
         this.cellSize = 60;
         Dimension boardSize = new Dimension(8 * cellSize, 8 * cellSize);
 
@@ -39,15 +42,15 @@ public class ChessUI extends JFrame implements MouseListener, MouseMotionListene
 
         chessBoard = new JPanel();
         layeredPane.add(chessBoard, JLayeredPane.DEFAULT_LAYER);
-        chessBoard.setLayout( new GridLayout(8, 8) );
-        chessBoard.setPreferredSize( boardSize );
+        chessBoard.setLayout(new GridLayout(8, 8));
+        chessBoard.setPreferredSize(boardSize);
         chessBoard.setBounds(0, 0, boardSize.width, boardSize.height);
 
         for (int i = 0; i < 64; i++) {
-            JPanel square = new JPanel( new BorderLayout() );
-            chessBoard.add( square );
+            JPanel square = new JPanel(new BorderLayout());
+            chessBoard.add(square);
 
-            square.setBackground( (i + i / 8) % 2 == 1 ? Color.GRAY : Color.WHITE );
+            square.setBackground((i + i / 8) % 2 == 1 ? Color.GRAY : Color.WHITE);
         }
 
         initIcons();
@@ -57,7 +60,7 @@ public class ChessUI extends JFrame implements MouseListener, MouseMotionListene
 
         pack();
         setResizable(true);
-        setLocationRelativeTo( null );
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
@@ -84,12 +87,12 @@ public class ChessUI extends JFrame implements MouseListener, MouseMotionListene
     private void initPieceLabels() {
         pieceLabels = new JLabel[64];
 
-        for(int k = 0; k < 64; k++) {
+        for (int k = 0; k < 64; k++) {
             JLabel label = new JLabel();
             label.setVisible(false);
             label.setSize(cellSize, cellSize);
             pieceLabels[k] = label;
-            JPanel panel = (JPanel)chessBoard.getComponent(k);
+            JPanel panel = (JPanel) chessBoard.getComponent(k);
             panel.add(label);
         }
     }
@@ -130,13 +133,12 @@ public class ChessUI extends JFrame implements MouseListener, MouseMotionListene
     public FromTo waitForPlayerMove() {
         moveFreshness = false;
 
-        while(! moveFreshness)
+        while (!moveFreshness)
             try {
                 synchronized (this.getClass()) {
                     this.getClass().wait();
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.err.println("ERROR : interrupted while waiting for chess move");
                 System.err.println(e);
                 System.exit(-1);
@@ -145,35 +147,38 @@ public class ChessUI extends JFrame implements MouseListener, MouseMotionListene
         return new FromTo(originXMove, originYMove, destXMove, destYMove);
     }
 
-    public void mousePressed(MouseEvent e){
+    public void mousePressed(MouseEvent e) {
         movingChessPiece = null;
 
         originXMove = e.getX() / cellSize;
         originYMove = e.getY() / cellSize;
 
-        xAdjustment = - e.getX() + originXMove * cellSize;
-        yAdjustment = - e.getY() + originYMove * cellSize;
+        xAdjustment = -e.getX() + originXMove * cellSize;
+        yAdjustment = -e.getY() + originYMove * cellSize;
 
         movingChessPiece = new JLabel(getPieceLabel(originYMove, originXMove).getIcon());
         movingChessPiece.setVisible(getPieceLabel(originYMove, originXMove).isVisible());
 
         movingChessPiece.setLocation(e.getX() + xAdjustment, e.getY() + yAdjustment);
-        if(movingChessPiece.getIcon() != null)
-            movingChessPiece.setSize(movingChessPiece.getIcon().getIconWidth(), movingChessPiece.getIcon().getIconHeight());
+        if (movingChessPiece.getIcon() != null)
+            movingChessPiece.setSize(movingChessPiece.getIcon().getIconWidth(),
+                    movingChessPiece.getIcon().getIconHeight());
         layeredPane.add(movingChessPiece, JLayeredPane.DRAG_LAYER);
     }
 
     //Move the chess piece around
 
     public void mouseDragged(MouseEvent me) {
-        if (movingChessPiece == null) return;
+        if (movingChessPiece == null)
+            return;
         movingChessPiece.setLocation(me.getX() + xAdjustment, me.getY() + yAdjustment);
     }
 
     //Drop the chess piece back onto the chess board
 
     public void mouseReleased(MouseEvent e) {
-        if(movingChessPiece == null) return;
+        if (movingChessPiece == null)
+            return;
 
         movingChessPiece.setVisible(false);
 
@@ -190,24 +195,31 @@ public class ChessUI extends JFrame implements MouseListener, MouseMotionListene
         }
     }
 
-    public void mouseClicked(MouseEvent e) {}
-    public void mouseMoved(MouseEvent e) {}
-    public void mouseEntered(MouseEvent e){}
-    public void mouseExited(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    public void mouseMoved(MouseEvent e) {
+    }
+
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    public void mouseExited(MouseEvent e) {
+    }
 
     public static void main(String[] args) {
         ChessUI ui = new ChessUI();
         ui.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        for(int k = 0; k < Piece.Type.values().length; k++)
+        for (int k = 0; k < Piece.Type.values().length; k++)
             ui.placePiece(Piece.Type.values()[k], ChessColor.BLACK, new Coordinates(k, 0));
 
-        for(int k = 0; k < Piece.Type.values().length; k++)
+        for (int k = 0; k < Piece.Type.values().length; k++)
             ui.placePiece(Piece.Type.values()[k], ChessColor.WHITE, new Coordinates(k, 1));
 
         ui.pack();
         ui.setResizable(true);
-        ui.setLocationRelativeTo( null );
+        ui.setLocationRelativeTo(null);
         ui.setVisible(true);
     }
 }
