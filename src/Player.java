@@ -12,8 +12,8 @@ import src.pieces.Rook;
 
 public abstract class Player {
     protected ChessColor color;
-    //private int score;
-    // private King king;
+    private int score;
+    private King king;
     public boolean isCheck;
     public boolean isCheckMate;
 
@@ -21,17 +21,20 @@ public abstract class Player {
     }
 
     public ChessColor getColor() {
-        return null;
+        return this.color;
     }
 
     public int getScore() {
-        return 0;
+        return score;
     }
 
     public void addToScore(int value) {
+
+        this.score += value;
     }
 
     public void removeFromScore(int value) {
+        this.score += value;
     }
 
     public abstract FromTo getFromTo();

@@ -25,7 +25,7 @@ public class GameUI {
     }
 
     public Board getBoard() {
-        return null;
+        return board;
     }
 
     public boolean undo() {
